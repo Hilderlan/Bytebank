@@ -14,13 +14,76 @@ class BytebankApp extends StatelessWidget {
 }
 
 class FormularioTransferencia extends StatelessWidget {
+  final TextEditingController _controladorCampoNumConta = TextEditingController();
+  final TextEditingController _controladorCampoValor = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Criando uma transferência'),
+        title: Text('Criando transferência'),
       ),
-      body: Text('Teste'),
+      body: Column(
+          children: <Widget>[
+            Editor(
+              controlador: _controladorCampoNumConta,
+              dica: '0000',
+              rotulo: 'Número da conta',
+            ),
+            Editor(
+              controlador: _controladorCampoValor,
+              dica: '0.00',
+              rotulo: 'Valor',
+              icone: Icons.monetization_on,
+            ),
+            RaisedButton(
+              child: Text('Confirmar'),
+              onPressed: () {
+                final int numConta = int.tryParse(_controladorCampoNumConta.text);
+                final double valor = double.tryParse(_controladorCampoValor.text);
+                _criaTransferencia(numConta, valor);
+              },
+            )
+          ],
+        )
+    );
+  }
+}
+
+void _criaTransferencia(numConta, valor){
+  if(numConta != null && valor != null){
+    final transferenciaCriada = Transferencia(valor, numConta);
+    debugPrint('$transferenciaCriada');    
+  }
+  else {
+    debugPrint('Campos preenchidos errados!');
+  }
+}
+
+class Editor extends StatelessWidget {
+  final TextEditingController controlador;
+  final String rotulo;
+  final String dica;
+  final IconData icone;
+
+  const Editor({this.controlador, this.rotulo, this.dica, this.icone});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextField(
+        controller: controlador,
+        style: TextStyle(
+          fontSize: 24.0
+        ),
+        decoration: InputDecoration(
+          icon: icone != null ? Icon(icone) : null,
+          labelText: rotulo,
+          hintText: dica
+        ),
+        keyboardType: TextInputType.number,
+      ),
     );
   }
 }
@@ -68,4 +131,8 @@ class Transferencia {
   final int numConta;
 
   Transferencia(this.valor, this.numConta);
+
+  String toString() {
+    return 'Transferencia{ Valor: $valor, numConta: $numConta }';
+  }
 }
